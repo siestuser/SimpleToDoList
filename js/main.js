@@ -1,5 +1,5 @@
-import ToDoList from '/js/todolist.js'
-// import ToDoItem from '/js/todoitem.js'
+import ToDoList from "/js/todolist.js";
+import ToDoItem from "/js/todoitem.js";
 
 const toDoList = new ToDoList();
 
