@@ -19,10 +19,36 @@ const initApp = () => {
        e.preventDefault();
        processSubmission();
     });
-
+    const clearItems = document.getElementById('clearItems');
+    clearItems.addEventListener('click', () => {
+        const list = toDoList.getList();
+        if (list.length){
+            const confirmed = confirm("Are you sure you want to delete the entire list?");
+            if (confirmed){
+                toDoList.clearList();
+                updatePersistentData(toDoList.getList());
+                refreshThePage();
+            }
+        }
+    })
     //procedural things
     //load list object
+    loadListObject();
     refreshThePage();
+}
+
+const loadListObject = () => {
+    const storedList = localStorage.getItem('myToDoList');
+    if (typeof storedList !== 'string'){
+        return;
+    }
+
+    const parseList = JSON.parse(storedList);
+    parseList.forEach(itemObj => {
+        const newToDoItem = createNewItem(itemObj._id, itemObj._item);
+        toDoList.addItemToList(newToDoItem);
+    });
+
 }
 
 const refreshThePage = () => {
@@ -40,7 +66,6 @@ const clearListDisplay = () => {
 const deleteContents = (parentElement) => {
     let child = parentElement.lastElementChild;
     while (child) {
-        console.log(child);
         parentElement.removeChild(child);
         child = parentElement.lastElementChild;
     }
@@ -56,16 +81,16 @@ const renderList = () => {
 const buildListItem = (item) => {
     const div = document.createElement('div');
     div.className = "item";
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = item.getId();
-    checkbox.tabIndex = 0;
+    const check = document.createElement('input');
+    check.type = 'checkbox';
+    check.id = item.getId();
+    check.tabIndex = 0;
     //add a click listener to checkbox
-    addClickListenerToCheckbox(checkbox);
+    addClickListenerToCheckbox(check);
     const  label = document.createElement('label');
     label.htmlFor = item.getId();
     label.textContent = item.getItem();
-    div.appendChild(checkbox);
+    div.appendChild(check);
     div.appendChild(label);
     const container = document.getElementById('listItems');
     container.appendChild(div);
@@ -74,12 +99,16 @@ const buildListItem = (item) => {
 const addClickListenerToCheckbox = (checkbox) => {
     checkbox.addEventListener('click', () => {
         toDoList.removeItemFromList(checkbox.id);
-        //TODO:remove from persistent data
+        updatePersistentData(toDoList.getList())
         setTimeout(()=>{
             refreshThePage();
         }, 1000);
 
     })
+}
+
+const updatePersistentData = (listArray) => {
+    localStorage.setItem('myToDoList', JSON.stringify(listArray));
 }
 
 const clearItemEntryField = () => {
@@ -99,7 +128,7 @@ const processSubmission = () => {
 
     const toDoItem = createNewItem(nextItemId, newEntryText);
     toDoList.addItemToList(toDoItem);
-    //TODO: update persistent data;
+    updatePersistentData(toDoList.getList())
     refreshThePage();
 }
 
@@ -112,9 +141,9 @@ const calcNextItemId = () => {
     const list = toDoList.getList();
     if (list.length > 0){
         nextItemId = list[list.length - 1].getId() + 1;
-    } else{
-        return nextItemId;
     }
+    return nextItemId;
+
 }
 
 const createNewItem = (itemId, itemText) => {
