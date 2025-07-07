@@ -10,13 +10,15 @@ document.addEventListener('readystatechange', (event) => {
     }
 });
 
-// const clearButton = document.getElementById('clearItems');
-// clearButton.addEventListener('click', (event) => {
-//     clearListDisplay();
-// })
+
 
 const initApp = () => {
     //add listeners
+    const itemEntryForm = document.getElementById('newItemForm');
+    itemEntryForm.addEventListener('submit', (e) => {
+       e.preventDefault();
+       processSubmission();
+    });
 
     //procedural things
     //load list object
@@ -86,4 +88,39 @@ const clearItemEntryField = () => {
 
 const setFocusOnItemEntry = () => {
     document.getElementById('newItem').focus();
+}
+
+const processSubmission = () => {
+    const newEntryText = getNewEntry();
+    if (!newEntryText.length) {
+        return;
+    }
+    const nextItemId = calcNextItemId();
+
+    const toDoItem = createNewItem(nextItemId, newEntryText);
+    toDoList.addItemToList(toDoItem);
+    //TODO: update persistent data;
+    refreshThePage();
+}
+
+const getNewEntry = () => {
+    return document.getElementById('newItem').value.trim();
+}
+
+const calcNextItemId = () => {
+    let nextItemId = 1;
+    const list = toDoList.getList();
+    if (list.length > 0){
+        nextItemId = list[list.length - 1].getId() + 1;
+    } else{
+        return nextItemId;
+    }
+}
+
+const createNewItem = (itemId, itemText) => {
+    const toDo = new ToDoItem();
+    toDo.setId(itemId);
+    toDo.setItem(itemText);
+
+    return toDo;
 }
