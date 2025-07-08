@@ -126,10 +126,14 @@ section {
   margin-right: 1.5rem;
 }
 .listContainer .item input[type=checkbox]:focus + label {
-  text-decoration: line-through;
+  text-decoration: underline;
 }
 .listContainer .item label {
   font-size: 1.1rem;
+}
+.listContainer .confirmation {
+  position: absolute;
+  left: -10000px;
 }
 
 /*# sourceMappingURL=styles.css.map */
